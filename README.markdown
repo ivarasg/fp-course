@@ -69,6 +69,9 @@ however, your first post might be moderated. This is simply to prevent spam.
 3. Execute the command `ghci`, which will compile and load all the source code.
    You may need to set permissions on the root directory and the ghci configuration
    file, `chmod 600 .ghci ./`.
+   
+   a. Alternatively to the above build the docker image with a `tag` and 
+      run `docker run -it --rm tag`. You will be in ghci inside the container.
 
 4. Inspect the introductory modules to get a feel for Haskell's syntax, then move
    on to the exercises starting with `Course.List`. The [Progression](#progression)
@@ -77,7 +80,7 @@ however, your first post might be moderated. This is simply to prevent spam.
 5. Edit a source file to a proposed solution to an exercise. At the `ghci`
    prompt, issue the command `:reload`. This will compile your solution and
    reload it in the GHC interpreter. You may use `:r` for short.
-
+   
 ### Tips after having started
 
 1. Some questions take a particular form. These are called *WTF questions*. WTF

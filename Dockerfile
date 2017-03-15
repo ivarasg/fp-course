@@ -15,5 +15,5 @@ RUN cabal install --only-dependencies -j4
 # Add and Install Application Code
 COPY . /fp-course
 RUN cabal install
-
+RUN chmod go-w /fp-course/.ghci
 CMD ["ghci"]

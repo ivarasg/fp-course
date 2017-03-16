@@ -14,6 +14,9 @@ RUN cabal install --only-dependencies -j4
 
 # Add and Install Application Code
 COPY . /fp-course
-RUN cabal install
 RUN chmod go-w /fp-course/.ghci
+
+RUN cabal configure --enable-tests && cabal build
+
+# doctest -isrc -Wall -fno-warn-type-defaults <filename.hs>
 CMD ["ghci"]

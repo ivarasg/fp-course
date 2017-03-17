@@ -379,7 +379,8 @@ filtering ::
   -> List a
   -> f (List a)
 filtering p = foldRight helper (pure Nil)
-  where helper el acc1 = lift2 (\b acc2 -> if b then el:.acc2 else acc2) (p el) acc1
+  where helper el = lift2 (\bool -> if bool then (el:.) else id) (p el)
+    -- helper el acc1 = lift2 (\b acc2 -> if b then el:.acc2 else acc2) (p el) acc1
   -- error "todo: Course.Applicative#filtering"
 
 -----------------------

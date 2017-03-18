@@ -52,7 +52,7 @@ To test this module, load ghci in the root of the project directory, and do
 Example output:
 
 $ ghci
-GHCi, version ... 
+GHCi, version ...
 Loading package...
 Loading ...
 [ 1 of 28] Compiling (etc...
@@ -71,43 +71,31 @@ the contents of c
 -}
 
 -- /Tip:/ use @getArgs@ and @run@
-main ::
-  IO ()
-main =
-  error "todo: Course.FileIO#main"
+main :: IO ()
+main = getArgs >>= run . headOr ""
+  -- error "todo: Course.FileIO#main"
 
-type FilePath =
-  Chars
+type FilePath = Chars
 
 -- /Tip:/ Use @getFiles@ and @printFiles@.
-run ::
-  Chars
-  -> IO ()
-run =
-  error "todo: Course.FileIO#run"
+run :: Chars -> IO ()
+run = (printFiles =<<) . getFiles . lines
+  -- error "todo: Course.FileIO#run"
 
-getFiles ::
-  List FilePath
-  -> IO (List (FilePath, Chars))
-getFiles =
-  error "todo: Course.FileIO#getFiles"
+getFiles :: List FilePath -> IO (List (FilePath, Chars))
+getFiles = sequence . map getFile
+  -- error "todo: Course.FileIO#getFiles"
 
-getFile ::
-  FilePath
-  -> IO (FilePath, Chars)
-getFile =
-  error "todo: Course.FileIO#getFile"
+getFile :: FilePath -> IO (FilePath, Chars)
+getFile path = readFile path >>= return . (,) path
+  -- error "todo: Course.FileIO#getFile"
 
-printFiles ::
-  List (FilePath, Chars)
-  -> IO ()
-printFiles =
-  error "todo: Course.FileIO#printFiles"
+printFiles :: List (FilePath, Chars) -> IO ()
+-- printFiles = (const (return () ) =<<) . sequence . map (\(path, contents) -> printFile path contents)
+printFiles = (const (return () ) =<<) . sequence . map uc_printFile
+  where uc_printFile = uncurry printFile
+  -- error "todo: Course.FileIO#printFiles"
 
-printFile ::
-  FilePath
-  -> Chars
-  -> IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
-
+printFile :: FilePath -> Chars -> IO ()
+printFile path contents = putStrLn . unlines $ ("======" ++ path):.contents:.Nil
+  -- error "todo: Course.FileIO#printFile"

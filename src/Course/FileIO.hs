@@ -72,7 +72,7 @@ the contents of c
 
 -- /Tip:/ use @getArgs@ and @run@
 main :: IO ()
-main = getArgs >>= run . headOr ""
+main = run . snd =<< getFile . headOr "" =<< getArgs
   -- error "todo: Course.FileIO#main"
 
 type FilePath = Chars
@@ -97,5 +97,5 @@ printFiles = (const (return () ) =<<) . sequence . map uc_printFile
   -- error "todo: Course.FileIO#printFiles"
 
 printFile :: FilePath -> Chars -> IO ()
-printFile path contents = putStrLn . unlines $ ("======" ++ path):.contents:.Nil
+printFile path contents = putStrLn . unlines $ ("====== " ++ path):.contents:.Nil
   -- error "todo: Course.FileIO#printFile"

@@ -25,10 +25,7 @@ import qualified Prelude as P((=<<))
 --   `∀f g x. g =<< (f =<< x) ≅ ((g =<<) . f) =<< x`
 class Applicative f => Monad f where
   -- Pronounced, bind.
-  (=<<) ::
-    (a -> f b)
-    -> f a
-    -> f b
+  (=<<) :: (a -> f b) -> f a -> f b
 
 infixr 1 =<<
 
@@ -63,11 +60,7 @@ infixr 1 =<<
 --
 -- >>> ((*) <*> (+2)) 3
 -- 15
-(<*>) ::
-  Monad f =>
-  f (a -> b)
-  -> f a
-  -> f b
+(<*>) :: Monad f => f (a -> b) -> f a -> f b
 (<*>) mf mx = mf >>= (<$> mx)
   -- error "todo: Course.Monad#(<*>)"
 
@@ -78,10 +71,7 @@ infixl 4 <*>
 -- >>> (\x -> Id(x+1)) =<< Id 2
 -- Id 3
 instance Monad Id where
-  (=<<) ::
-    (a -> Id b)
-    -> Id a
-    -> Id b
+  (=<<) :: (a -> Id b) -> Id a -> Id b
   (=<<) = bindId
     -- error "todo: Course.Monad (=<<)#instance Id"
 
@@ -90,10 +80,7 @@ instance Monad Id where
 -- >>> (\n -> n :. n :. Nil) =<< (1 :. 2 :. 3 :. Nil)
 -- [1,1,2,2,3,3]
 instance Monad List where
-  (=<<) ::
-    (a -> List b)
-    -> List a
-    -> List b
+  (=<<) :: (a -> List b) -> List a -> List b
   (=<<) = flatMap
     -- error "todo: Course.Monad (=<<)#instance List"
 
@@ -102,10 +89,7 @@ instance Monad List where
 -- >>> (\n -> Full (n + n)) =<< Full 7
 -- Full 14
 instance Monad Optional where
-  (=<<) ::
-    (a -> Optional b)
-    -> Optional a
-    -> Optional b
+  (=<<) :: (a -> Optional b) -> Optional a -> Optional b
   (=<<) = bindOptional
     -- error "todo: Course.Monad (=<<)#instance Optional"
 
@@ -114,10 +98,7 @@ instance Monad Optional where
 -- >>> ((*) =<< (+10)) 7
 -- 119
 instance Monad ((->) t) where
-  (=<<) ::
-    (a -> ((->) t b))
-    -> ((->) t a)
-    -> ((->) t b)
+  (=<<) :: (a -> ((->) t b)) -> ((->) t a) -> ((->) t b)
   (=<<) f ta = \t -> f (ta t) t
     -- error "todo: Course.Monad (=<<)#instance ((->) t)"
 
@@ -134,10 +115,7 @@ instance Monad ((->) t) where
 --
 -- >>> join (+) 7
 -- 14
-join ::
-  Monad f =>
-  f (f a)
-  -> f a
+join :: Monad f => f (f a) -> f a
 join = (id =<<)
   -- error "todo: Course.Monad#join"
 
@@ -147,11 +125,7 @@ join = (id =<<)
 --
 -- >>> ((+10) >>= (*)) 7
 -- 119
-(>>=) ::
-  Monad f =>
-  f a
-  -> (a -> f b)
-  -> f b
+(>>=) :: Monad f => f a -> (a -> f b) -> f b
 (>>=) = flip (=<<)
   -- error "todo: Course.Monad#(>>=)"
 
@@ -162,12 +136,7 @@ infixl 1 >>=
 --
 -- >>> ((\n -> n :. n :. Nil) <=< (\n -> n+1 :. n+2 :. Nil)) 1
 -- [2,2,3,3]
-(<=<) ::
-  Monad f =>
-  (b -> f c)
-  -> (a -> f b)
-  -> a
-  -> f c
+(<=<) :: Monad f => (b -> f c) -> (a -> f b) -> a -> f c
 (<=<) f g = (f =<<) . g
   -- error "todo: Course.Monad#(<=<)"
 
@@ -178,5 +147,4 @@ infixr 1 <=<
 -----------------------
 
 instance Monad IO where
-  (=<<) =
-    (P.=<<)
+  (=<<) = (P.=<<)

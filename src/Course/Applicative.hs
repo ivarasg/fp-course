@@ -37,12 +37,8 @@ import qualified Prelude as P(fmap, return, (>>=))
 -- * The law of right identity
 --   `∀x. x <*> pure id ≅ x`
 class Functor f => Applicative f where
-  pure ::
-    a -> f a
-  (<*>) ::
-    f (a -> b)
-    -> f a
-    -> f b
+  pure :: a -> f a
+  (<*>) :: f (a -> b) -> f a -> f b
 
 infixl 4 <*>
 
@@ -56,11 +52,7 @@ infixl 4 <*>
 --
 -- >>> (+1) <$> (1 :. 2 :. 3 :. Nil)
 -- [2,3,4]
-(<$>) ::
-  Applicative f =>
-  (a -> b)
-  -> f a
-  -> f b
+(<$>) :: Applicative f => (a -> b) -> f a -> f b
 (<$>) f x = pure f <*> x
   -- error "todo: Course.Applicative#(<$>)"
 
@@ -71,15 +63,10 @@ infixl 4 <*>
 -- >>> Id (+10) <*> Id 8
 -- Id 18
 instance Applicative Id where
-  pure ::
-    a
-    -> Id a
+  pure :: a -> Id a
   pure = Id
     -- error "todo: Course.Applicative pure#instance Id"
-  (<*>) ::
-    Id (a -> b)
-    -> Id a
-    -> Id b
+  (<*>) :: Id (a -> b) -> Id a -> Id b
   Id f <*> Id x = Id $ f x
     -- error "todo: Course.Applicative (<*>)#instance Id"
 
@@ -90,15 +77,10 @@ instance Applicative Id where
 -- >>> (+1) :. (*2) :. Nil <*> 1 :. 2 :. 3 :. Nil
 -- [2,3,4,2,4,6]
 instance Applicative List where
-  pure ::
-    a
-    -> List a
+  pure :: a -> List a
   pure x = x:.Nil
     -- error "todo: Course.Applicative pure#instance List"
-  (<*>) ::
-    List (a -> b)
-    -> List a
-    -> List b
+  (<*>) :: List (a -> b) -> List a -> List b
   (<*>) fs xs = foldRight (\f acc -> (f `map` xs) ++ acc) Nil fs
     -- error "todo: Course.Apply (<*>)#instance List"
 
@@ -115,15 +97,10 @@ instance Applicative List where
 -- >>> Full (+8) <*> Empty
 -- Empty
 instance Applicative Optional where
-  pure ::
-    a
-    -> Optional a
+  pure :: a -> Optional a
   pure = Full
     -- error "todo: Course.Applicative pure#instance Optional"
-  (<*>) ::
-    Optional (a -> b)
-    -> Optional a
-    -> Optional b
+  (<*>) :: Optional (a -> b) -> Optional a -> Optional b
   (<*>) (Full f) (Full x) = Full $ f x
   (<*>) _ _               = Empty
     -- error "todo: Course.Apply (<*>)#instance Optional"
@@ -147,15 +124,10 @@ instance Applicative Optional where
 --
 -- prop> pure x y == x
 instance Applicative ((->) t) where
-  pure ::
-    a
-    -> ((->) t a)
+  pure :: a -> ((->) t a)
   pure x = const x
     -- error "todo: Course.Applicative pure#((->) t)"
-  (<*>) ::
-    ((->) t (a -> b))
-    -> ((->) t a)
-    -> ((->) t b)
+  (<*>) :: ((->) t (a -> b)) -> ((->) t a) -> ((->) t b)
   (<*>) f x = \t -> (f t) (x t)
     -- error "todo: Course.Apply (<*>)#instance ((->) t)"
 
@@ -179,12 +151,7 @@ instance Applicative ((->) t) where
 --
 -- >>> lift2 (+) length sum (listh [4,5,6])
 -- 18
-lift2 ::
-  Applicative f =>
-  (a -> b -> c)
-  -> f a
-  -> f b
-  -> f c
+lift2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
 lift2 f x y = f <$> x <*> y
   -- error "todo: Course.Applicative#lift2"
 
@@ -210,13 +177,7 @@ lift2 f x y = f <$> x <*> y
 --
 -- >>> lift3 (\a b c -> a + b + c) length sum product (listh [4,5,6])
 -- 138
-lift3 ::
-  Applicative f =>
-  (a -> b -> c -> d)
-  -> f a
-  -> f b
-  -> f c
-  -> f d
+lift3 :: Applicative f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
 lift3 f x y z = f <$> x <*> y <*> z
   -- error "todo: Course.Applicative#lift3"
 
@@ -242,14 +203,7 @@ lift3 f x y z = f <$> x <*> y <*> z
 --
 -- >>> lift4 (\a b c d -> a + b + c + d) length sum product (sum . filter even) (listh [4,5,6])
 -- 148
-lift4 ::
-  Applicative f =>
-  (a -> b -> c -> d -> e)
-  -> f a
-  -> f b
-  -> f c
-  -> f d
-  -> f e
+lift4 :: Applicative f => (a -> b -> c -> d -> e) -> f a -> f b -> f c -> f d -> f e
 lift4 f w x y z = f <$> w <*> x <*> y <*> z
   -- error "todo: Course.Applicative#lift4"
 
@@ -271,11 +225,7 @@ lift4 f w x y z = f <$> w <*> x <*> y <*> z
 -- prop> (a :. b :. c :. Nil) *> (x :. y :. z :. Nil) == (x :. y :. z :. x :. y :. z :. x :. y :. z :. Nil)
 --
 -- prop> Full x *> Full y == Full y
-(*>) ::
-  Applicative f =>
-  f a
-  -> f b
-  -> f b
+(*>) :: Applicative f => f a -> f b -> f b
 (*>) a b = (id <$ a) <*> b
   -- error "todo: Course.Applicative#(*>)"
 
@@ -297,11 +247,7 @@ lift4 f w x y z = f <$> w <*> x <*> y <*> z
 -- prop> (x :. y :. z :. Nil) <* (a :. b :. c :. Nil) == (x :. x :. x :. y :. y :. y :. z :. z :. z :. Nil)
 --
 -- prop> Full x <* Full y == Full x
-(<*) ::
-  Applicative f =>
-  f b
-  -> f a
-  -> f b
+(<*) :: Applicative f => f b -> f a -> f b
 (<*) = lift2 const
   -- error "todo: Course.Applicative#(<*)"
 
@@ -321,12 +267,9 @@ lift4 f w x y z = f <$> w <*> x <*> y <*> z
 --
 -- >>> sequence ((*10) :. (+2) :. Nil) 6
 -- [60,8]
-sequence ::
-  Applicative f =>
-  List (f a)
-  -> f (List a)
+sequence :: Applicative f => List (f a) -> f (List a)
 -- sequence Nil = pure Nil
--- sequence (f:.fs) = lift2 (:) f (sequence fs)
+-- sequence (f:.fs) = lift2 (:.) f (sequence fs)
 sequence = foldRight (lift2 (:.)) (pure Nil)
 
 -- | Replicate an effect a given number of times.
@@ -345,11 +288,7 @@ sequence = foldRight (lift2 (:.)) (pure Nil)
 --
 -- >>> replicateA 3 ('a' :. 'b' :. 'c' :. Nil)
 -- ["aaa","aab","aac","aba","abb","abc","aca","acb","acc","baa","bab","bac","bba","bbb","bbc","bca","bcb","bcc","caa","cab","cac","cba","cbb","cbc","cca","ccb","ccc"]
-replicateA ::
-  Applicative f =>
-  Int
-  -> f a
-  -> f (List a)
+replicateA :: Applicative f => Int -> f a -> f (List a)
 replicateA n = sequence . replicate n
   -- error "todo: Course.Applicative#replicateA"
 
@@ -373,11 +312,7 @@ replicateA n = sequence . replicate n
 -- >>> filtering (const $ True :. True :.  Nil) (1 :. 2 :. 3 :. Nil)
 -- [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]]
 --
-filtering ::
-  Applicative f =>
-  (a -> f Bool)
-  -> List a
-  -> f (List a)
+filtering :: Applicative f => (a -> f Bool) -> List a -> f (List a)
 filtering p = foldRight helper (pure Nil)
   where helper el = lift2 (\bool -> if bool then (el:.) else id) (p el)
     -- helper el acc1 = lift2 (\b acc2 -> if b then el:.acc2 else acc2) (p el) acc1
@@ -388,29 +323,14 @@ filtering p = foldRight helper (pure Nil)
 -----------------------
 
 instance Applicative IO where
-  pure =
-    P.return
-  f <*> a =
-    f P.>>= \f' -> P.fmap f' a
+  pure = P.return
+  f <*> a = f P.>>= \f' -> P.fmap f' a
 
-return ::
-  Applicative f =>
-  a
-  -> f a
-return =
-  pure
+return :: Applicative f => a -> f a
+return = pure
 
-fail ::
-  Applicative f =>
-  Chars
-  -> f a
-fail =
-  error . hlist
+fail :: Applicative f => Chars -> f a
+fail = error . hlist
 
-(>>) ::
-  Applicative f =>
-  f a
-  -> f b
-  -> f b
-(>>) =
-  (*>)
+(>>) :: Applicative f => f a -> f b -> f b
+(>>) = (*>)

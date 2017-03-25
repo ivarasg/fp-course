@@ -173,11 +173,9 @@ distinctF xs = evalT (filtering unique'' xs) S.empty
   -- error "todo: Course.StateT#distinctF"
 
 unique'' :: (Ord a, Num a) => a -> StateT (S.Set a) Optional Bool
-unique'' x = StateT $ \s -> if x > 100
-                              then Empty
-                              else if x `S.member` s
-                                    then Full (False, s)
-                                    else Full (True , x `S.insert` s)
+unique'' x = StateT $ \s -> if | x > 100        -> Empty
+                               | x `S.member` s -> Full (False, s)
+                               | otherwise      -> Full (True , x `S.insert` s)
 
 -- | An `OptionalT` is a functor of an `Optional` value.
 data OptionalT f a =
@@ -281,15 +279,15 @@ distinctG :: (Integral a, Show a) => List a -> Logger Chars (Optional (List a))
 distinctG xs = runOptionalT $ evalT (filtering uniqueG xs) S.empty
 
 logNumber :: (Show n, Integral n) => n -> a -> Logger Chars a
-logNumber n
-  | even n    = log1 $ "even number: " ++ listh (show n)
-  | otherwise = Logger Nil
+logNumber n | even n    = log1 $ "even number: " ++ listh (show n)
+            | otherwise = Logger Nil
 
 logAbort :: (Show n) => n -> a -> Logger Chars a
 logAbort n = log1 $ "aborting > 100: " ++ listh (show n)
 
 uniqueG :: (Integral a, Show a) => a -> StateT (S.Set a) (OptionalT (Logger Chars)) Bool
-uniqueG x = StateT $ (\s -> if | x > 100        -> OptionalT $ logAbort x Empty
-                               | x `S.member` s -> OptionalT $ logNumber x $ Full (False, s)
-                               | otherwise      -> OptionalT $ logNumber x $ Full (True , x `S.insert` s)
-                               )
+uniqueG x = StateT g
+  where g s =
+          if | x > 100        -> OptionalT $ logAbort x Empty
+             | x `S.member` s -> OptionalT $ logNumber x $ Full (False, s)
+             | otherwise      -> OptionalT $ logNumber x $ Full (True , x `S.insert` s)
